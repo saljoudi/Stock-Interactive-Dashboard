@@ -188,7 +188,7 @@ app.layout = dbc.Container([
 
     dbc.Row([
         dbc.Col([
-            html.Footer("Stock Dashboard © 2024", className="text-center text-muted")
+            html.Footer("Stock Dashboard © 2024 By Salman", className="text-center text-muted")
         ])
     ], className="mt-4")
 ], fluid=True)
