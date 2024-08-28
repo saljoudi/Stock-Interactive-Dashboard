@@ -307,7 +307,7 @@ def update_graphs(ticker):
     candlestick_fig.add_trace(go.Bar(x=df.index, y=df['Volume'], name='Volume', marker_color='rgba(52, 152, 219, 0.5)', yaxis='y2'))
     candlestick_fig.update_layout(
         title=f'{ticker} Candlestick Chart',
-        yaxis_title='Stock Price (USD)',
+        yaxis_title='Stock Price)',
         xaxis_title='Date',
         template='plotly_dark',
         yaxis2=dict(title='Volume', overlaying='y', side='right')
@@ -324,7 +324,7 @@ def update_graphs(ticker):
     sma_ema_fig.add_trace(go.Scatter(x=df.index, y=df['EMA_200'], mode='lines', name='EMA 200'))
     sma_ema_fig.update_layout(
         title=f'{ticker} SMA & EMA',
-        yaxis_title='Stock Price (USD)',
+        yaxis_title='Stock Price',
         xaxis_title='Date',
         template='plotly_dark'
     )
@@ -338,7 +338,7 @@ def update_graphs(ticker):
     support_resistance_fig.add_trace(go.Scatter(x=df.index, y=df['Resistance_2'], mode='lines', name='Resistance 2', line=dict(dash='dot')))
     support_resistance_fig.update_layout(
         title=f'{ticker} Support & Resistance',
-        yaxis_title='Stock Price (USD)',
+        yaxis_title='Stock Price',
         xaxis_title='Date',
         template='plotly_dark'
     )
@@ -383,7 +383,7 @@ def update_graphs(ticker):
     bollinger_bands_fig.add_trace(go.Scatter(x=df.index, y=df['Lower_band'], mode='lines', name='Lower Band'))
     bollinger_bands_fig.update_layout(
         title=f'{ticker} Bollinger Bands',
-        yaxis_title='Stock Price (USD)',
+        yaxis_title='Stock Price',
         xaxis_title='Date',
         template='plotly_dark'
     )
@@ -543,7 +543,7 @@ def update_graphs(ticker):
                                      mode='lines', name=f'Fibonacci {level}', line=dict(dash='dash')))
     fibonacci_retracement_fig.update_layout(
         title=f'{ticker} Fibonacci Retracement',
-        yaxis_title='Stock Price (USD)',
+        yaxis_title='Stock Price',
         xaxis_title='Date',
         template='plotly_dark'
     )
@@ -557,7 +557,7 @@ def update_graphs(ticker):
     ichimoku_cloud_fig.add_trace(go.Scatter(x=df.index, y=df['Chikou_span'], mode='lines', name='Chikou Span'))
     ichimoku_cloud_fig.update_layout(
         title=f'{ticker} Ichimoku Cloud',
-        yaxis_title='Stock Price (USD)',
+        yaxis_title='Stock Price',
         xaxis_title='Date',
         template='plotly_dark'
     )
@@ -567,7 +567,7 @@ def update_graphs(ticker):
     vwap_fig.add_trace(go.Scatter(x=df.index, y=df['VWAP'], mode='lines', name='VWAP'))
     vwap_fig.update_layout(
         title=f'{ticker} VWAP',
-        yaxis_title='Stock Price (USD)',
+        yaxis_title='Stock Price',
         xaxis_title='Date',
         template='plotly_dark'
     )
