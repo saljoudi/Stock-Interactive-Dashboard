@@ -1,5 +1,3 @@
-# Plotting Price Levels, Supports, and Resistances
-
 import dash
 from dash import dcc, html
 from dash.dependencies import Input, Output
@@ -7,51 +5,217 @@ import yfinance as yf
 import plotly.graph_objs as go
 import pandas as pd
 import ta
+import dash_bootstrap_components as dbc
 import warnings
 warnings.filterwarnings("ignore")
 
-# Initialize the Dash app
-app = dash.Dash(__name__)
+# Initialize the Dash app with Bootstrap theme
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SOLAR])
 server = app.server
 
 # Define the layout of the app
-app.layout = html.Div([
-    html.H1("Stock Dashboard", style={'textAlign': 'center'}),
-    dcc.Input(id='stock-input', type='text', placeholder='Enter stock symbol', value='AAPL', debounce=True),
-    dcc.Dropdown(
-        id='chart-type-dropdown',
-        options=[
-            {'label': 'Candlestick Chart', 'value': 'candlestick'},
-            {'label': 'SMA & EMA', 'value': 'sma-ema'},
-            {'label': 'Support & Resistance', 'value': 'support-resistance'},
-            {'label': 'RSI', 'value': 'rsi'},
-            {'label': 'Bollinger Bands', 'value': 'bollinger-bands'},
-            {'label': 'MACD', 'value': 'macd'},
-            {'label': 'Stochastic Oscillator', 'value': 'stochastic oscillator'},
-            {'label': 'On-Balance Volume', 'value': 'OBV'},
-            {'label': 'Average True Range', 'value': 'ATR'},
-            {'label': 'Commodity Channel Index', 'value': 'CCI'},
-            {'label': 'Money Flow Index', 'value': 'MFI'},
-            {'label': 'Chaikin Money Flow', 'value': 'CMF'},
-            {'label': 'Force Index', 'value': 'FI'},
-            {'label': 'Fibonacci Retracement', 'value': 'fibonacci-retracement'},
-            {'label': 'Ichimoku Cloud', 'value': 'ichimoku-cloud'},
-            {'label': 'VWAP', 'value': 'vwap'},
-            {'label': 'ADX & DI', 'value': 'adx-di'},
-            {'label': 'ADL & SMA ADL', 'value': 'adl'}
-        ],
-        value='candlestick',
-        style={'margin-top': '10px'}
+app.layout = dbc.Container([
+    dbc.NavbarSimple(
+        brand="Stock Dashboard",
+        brand_href="#",
+        color="drak brown",
+        dark=True,
     ),
-    dcc.Graph(id='stock-graph'),
-])
+    dbc.Row([
+        dbc.Col([
+            dbc.InputGroup([
+                dbc.Input(id='stock-input', placeholder='Enter stock symbol', value='1303', debounce=True),
+                dbc.InputGroupText('.SR'),
+            ]),
+        ], width=4),
+    ], justify='center', className="my-3"),
+    
+    dbc.Row([
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id='candlestick-chart')
+                ])
+            ]),
+        ], width=12),
+    ], className="mb-4"),
+    
+    dbc.Row([
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id='sma-ema-chart')
+                ])
+            ]),
+        ], width=12),
+    ], className="mb-4"),
+    
+    dbc.Row([
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id='support-resistance-chart')
+                ])
+            ]),
+        ], width=6),
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id='rsi-chart')
+                ])
+            ]),
+        ], width=6),
+    ], className="mb-4"),
+    
+    dbc.Row([
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id='bollinger-bands-chart')
+                ])
+            ]),
+        ], width=6),
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id='macd-chart')
+                ])
+            ]),
+        ], width=6),
+    ], className="mb-4"),
+    
+    dbc.Row([
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id='stochastic-oscillator-chart')
+                ])
+            ]),
+        ], width=6),
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id='obv-chart')
+                ])
+            ]),
+        ], width=6),
+    ], className="mb-4"),
+    
+    dbc.Row([
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id='atr-chart')
+                ])
+            ]),
+        ], width=6),
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id='cci-chart')
+                ])
+            ]),
+        ], width=6),
+    ], className="mb-4"),
+    
+    dbc.Row([
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id='mfi-chart')
+                ])
+            ]),
+        ], width=6),
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id='cmf-chart')
+                ])
+            ]),
+        ], width=6),
+    ], className="mb-4"),
+    
+    dbc.Row([
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id='fi-chart')
+                ])
+            ]),
+        ], width=6),
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id='fibonacci-retracement-chart')
+                ])
+            ]),
+        ], width=6),
+    ], className="mb-4"),
+    
+    dbc.Row([
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id='ichimoku-cloud-chart')
+                ])
+            ]),
+        ], width=6),
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id='vwap-chart')
+                ])
+            ]),
+        ], width=6),
+    ], className="mb-4"),
+    
+    dbc.Row([
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id='adl-chart')
+                ])
+            ]),
+        ], width=6),
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id='adx-di-chart')
+                ])
+            ]),
+        ], width=6),
+    ], className="mb-4"),
 
-# Define the callback to update the graph
+    dbc.Row([
+        dbc.Col([
+            html.Footer("Stock Dashboard © 2024", className="text-center text-muted")
+        ])
+    ], className="mt-4")
+], fluid=True)
+
+# Define the callback to update the graphs
 @app.callback(
-    Output('stock-graph', 'figure'),
-    [Input('stock-input', 'value'), Input('chart-type-dropdown', 'value')]
+    [Output('candlestick-chart', 'figure'),
+     Output('sma-ema-chart', 'figure'),
+     Output('support-resistance-chart', 'figure'),
+     Output('rsi-chart', 'figure'),
+     Output('bollinger-bands-chart', 'figure'),
+     Output('macd-chart', 'figure'),
+     Output('stochastic-oscillator-chart', 'figure'),
+     Output('obv-chart', 'figure'),
+     Output('atr-chart', 'figure'),
+     Output('cci-chart', 'figure'),
+     Output('mfi-chart', 'figure'),
+     Output('cmf-chart', 'figure'),
+     Output('fi-chart', 'figure'),
+     Output('fibonacci-retracement-chart', 'figure'),
+     Output('ichimoku-cloud-chart', 'figure'),
+     Output('vwap-chart', 'figure'),
+     Output('adl-chart', 'figure'),
+     Output('adx-di-chart', 'figure')],
+    [Input('stock-input', 'value')]
 )
-def update_graph(ticker, graph_type):
+def update_graphs(ticker):
     # Check if the ticker is an integer, append '.SR' if it is
     if ticker.isdigit():
         ticker += '.SR'
@@ -85,6 +249,7 @@ def update_graph(ticker, graph_type):
     signal = macd.ewm(span=9, adjust=False).mean().round(2)
     df['MACD'] = macd
     df['MACD_Signal'] = signal
+
     stoch = ta.momentum.StochasticOscillator(df['High'], df['Low'], df['Close'])
     df['%K'] = stoch.stoch()
     df['%D'] = stoch.stoch_signal()
@@ -132,286 +297,308 @@ def update_graph(ticker, graph_type):
     df['Senkou_span_b'] = ((df['High'].rolling(window=52).max() + df['Low'].rolling(window=52).min()) / 2).shift(26)
     df['Chikou_span'] = df['Close'].shift(-26)
 
-    fig = go.Figure()
+    # Candlestick Chart
+    candlestick_fig = go.Figure(go.Candlestick(x=df.index,
+                                               open=df['Open'],
+                                               high=df['High'],
+                                               low=df['Low'],
+                                               close=df['Close'],
+                                               name='Candlestick'))
+    candlestick_fig.add_trace(go.Bar(x=df.index, y=df['Volume'], name='Volume', marker_color='rgba(52, 152, 219, 0.5)', yaxis='y2'))
+    candlestick_fig.update_layout(
+        title=f'{ticker} Candlestick Chart',
+        yaxis_title='Stock Price (USD)',
+        xaxis_title='Date',
+        template='plotly_dark',
+        yaxis2=dict(title='Volume', overlaying='y', side='right')
+    )
 
-    if graph_type == 'candlestick':
-        fig.add_trace(go.Candlestick(x=df.index,
-                                     open=df['Open'],
-                                     high=df['High'],
-                                     low=df['Low'],
-                                     close=df['Close'],
-                                     name='Candlestick'))
-        fig.add_trace(go.Bar(x=df.index, y=df['Volume'], name='Volume', marker_color='rgba(52, 152, 219, 0.5)', yaxis='y2'))
-        fig.update_layout(
-            title=f'{ticker} Candlestick Chart',
-            yaxis_title='Stock Price (USD)',
-            xaxis_title='Date',
-            template='plotly_dark',
-            yaxis2=dict(title='Volume', overlaying='y', side='right')
+    # SMA & EMA Chart
+    sma_ema_fig = go.Figure()
+    sma_ema_fig.add_trace(go.Scatter(x=df.index, y=df['Close'], mode='lines', name='Close'))
+    sma_ema_fig.add_trace(go.Scatter(x=df.index, y=df['SMA_20'], mode='lines', name='SMA 20'))
+    sma_ema_fig.add_trace(go.Scatter(x=df.index, y=df['SMA_50'], mode='lines', name='SMA 50'))
+    sma_ema_fig.add_trace(go.Scatter(x=df.index, y=df['SMA_200'], mode='lines', name='SMA 200'))
+    sma_ema_fig.add_trace(go.Scatter(x=df.index, y=df['EMA_20'], mode='lines', name='EMA 20'))
+    sma_ema_fig.add_trace(go.Scatter(x=df.index, y=df['EMA_50'], mode='lines', name='EMA 50'))
+    sma_ema_fig.add_trace(go.Scatter(x=df.index, y=df['EMA_200'], mode='lines', name='EMA 200'))
+    sma_ema_fig.update_layout(
+        title=f'{ticker} SMA & EMA',
+        yaxis_title='Stock Price (USD)',
+        xaxis_title='Date',
+        template='plotly_dark'
+    )
+
+    # Support & Resistance Chart
+    support_resistance_fig = go.Figure()
+    support_resistance_fig.add_trace(go.Scatter(x=df.index, y=df['Pivot_Point'], mode='lines', name='Pivot Point', line=dict(dash='dash')))
+    support_resistance_fig.add_trace(go.Scatter(x=df.index, y=df['Support_1'], mode='lines', name='Support 1', line=dict(dash='dot')))
+    support_resistance_fig.add_trace(go.Scatter(x=df.index, y=df['Resistance_1'], mode='lines', name='Resistance 1', line=dict(dash='dot')))
+    support_resistance_fig.add_trace(go.Scatter(x=df.index, y=df['Support_2'], mode='lines', name='Support 2', line=dict(dash='dot')))
+    support_resistance_fig.add_trace(go.Scatter(x=df.index, y=df['Resistance_2'], mode='lines', name='Resistance 2', line=dict(dash='dot')))
+    support_resistance_fig.update_layout(
+        title=f'{ticker} Support & Resistance',
+        yaxis_title='Stock Price (USD)',
+        xaxis_title='Date',
+        template='plotly_dark'
+    )
+
+    # RSI Chart
+    rsi_fig = go.Figure(go.Scatter(x=df.index, y=df['RSI'], mode='lines', name='RSI'))
+    rsi_fig.add_shape(
+        type='line',
+        x0=df.index[0],
+        y0=70,
+        x1=df.index[-1],
+        y1=70,
+        line=dict(
+            color='Red',
+            width=2,
+            dash='dash',
         )
-    elif graph_type == 'sma-ema':
-        fig.add_trace(go.Scatter(x=df.index, y=df['Close'], mode='lines', name='Close'))
-        fig.add_trace(go.Scatter(x=df.index, y=df['SMA_20'], mode='lines', name='SMA 20'))
-        fig.add_trace(go.Scatter(x=df.index, y=df['SMA_50'], mode='lines', name='SMA 50'))
-        fig.add_trace(go.Scatter(x=df.index, y=df['SMA_200'], mode='lines', name='SMA 200'))
-        fig.add_trace(go.Scatter(x=df.index, y=df['EMA_20'], mode='lines', name='EMA 20'))
-        fig.add_trace(go.Scatter(x=df.index, y=df['EMA_50'], mode='lines', name='EMA 50'))
-        fig.add_trace(go.Scatter(x=df.index, y=df['EMA_200'], mode='lines', name='EMA 200'))
-        fig.update_layout(
-            title=f'{ticker} SMA & EMA',
-            yaxis_title='Stock Price (USD)',
-            xaxis_title='Date',
-            template='plotly_dark'
+    )
+    rsi_fig.add_shape(
+        type='line',
+        x0=df.index[0],
+        y0=30,
+        x1=df.index[-1],
+        y1=30,
+        line=dict(
+            color='Green',
+            width=2,
+            dash='dash',
         )
-    elif graph_type == 'support-resistance':
-        fig.add_trace(go.Scatter(x=df.index, y=df['Pivot_Point'], mode='lines', name='Pivot Point', line=dict(dash='dash')))
-        fig.add_trace(go.Scatter(x=df.index, y=df['Support_1'], mode='lines', name='Support 1', line=dict(dash='dot')))
-        fig.add_trace(go.Scatter(x=df.index, y=df['Resistance_1'], mode='lines', name='Resistance 1', line=dict(dash='dot')))
-        fig.add_trace(go.Scatter(x=df.index, y=df['Support_2'], mode='lines', name='Support 2', line=dict(dash='dot')))
-        fig.add_trace(go.Scatter(x=df.index, y=df['Resistance_2'], mode='lines', name='Resistance 2', line=dict(dash='dot')))
-        fig.update_layout(
-            title=f'{ticker} Support & Resistance',
-            yaxis_title='Stock Price (USD)',
-            xaxis_title='Date',
-            template='plotly_dark'
+    )
+    rsi_fig.update_layout(
+        title=f'{ticker} RSI',
+        yaxis_title='RSI',
+        xaxis_title='Date',
+        template='plotly_dark'
+    )
+
+    # Bollinger Bands Chart
+    bollinger_bands_fig = go.Figure()
+    bollinger_bands_fig.add_trace(go.Scatter(x=df.index, y=df['Close'], mode='lines', name='Close Price'))
+    bollinger_bands_fig.add_trace(go.Scatter(x=df.index, y=df['Upper_band'], mode='lines', name='Upper Band'))
+    bollinger_bands_fig.add_trace(go.Scatter(x=df.index, y=df['Lower_band'], mode='lines', name='Lower Band'))
+    bollinger_bands_fig.update_layout(
+        title=f'{ticker} Bollinger Bands',
+        yaxis_title='Stock Price (USD)',
+        xaxis_title='Date',
+        template='plotly_dark'
+    )
+
+    # MACD Chart
+    macd_fig = go.Figure()
+    macd_fig.add_trace(go.Scatter(x=df.index, y=df['MACD'], mode='lines', name='MACD'))
+    macd_fig.add_trace(go.Scatter(x=df.index, y=df['MACD_Signal'], mode='lines', name='MACD Signal'))
+    macd_fig.update_layout(
+        title=f'{ticker} MACD',
+        yaxis_title='MACD',
+        xaxis_title='Date',
+        template='plotly_dark'
+    )
+
+    # Stochastic Oscillator Chart
+    stochastic_oscillator_fig = go.Figure()
+    stochastic_oscillator_fig.add_trace(go.Scatter(x=df.index, y=df['%K'], mode='lines', name='%K'))
+    stochastic_oscillator_fig.add_trace(go.Scatter(x=df.index, y=df['%D'], mode='lines', name='%D'))
+    stochastic_oscillator_fig.update_layout(
+        title=f'{ticker} Stochastic Oscillator',
+        yaxis_title='Stochastic Oscillator',
+        xaxis_title='Date',
+        template='plotly_dark'
+    )
+
+    # On-Balance Volume (OBV) Chart
+    obv_fig = go.Figure(go.Scatter(x=df.index, y=df['OBV'], mode='lines', name='OBV'))
+    obv_fig.update_layout(
+        title=f'{ticker} On-Balance Volume',
+        yaxis_title='OBV',
+        xaxis_title='Date',
+        template='plotly_dark'
+    )
+
+    # Average True Range (ATR) Chart
+    atr_fig = go.Figure(go.Scatter(x=df.index, y=df['ATR'], mode='lines', name='ATR'))
+    atr_fig.update_layout(
+        title=f'{ticker} Average True Range',
+        yaxis_title='ATR',
+        xaxis_title='Date',
+        template='plotly_dark'
+    )
+
+    # Commodity Channel Index (CCI) Chart
+    cci_fig = go.Figure(go.Scatter(x=df.index, y=df['CCI'], mode='lines', name='CCI'))
+    cci_fig.add_shape(
+        type='line',
+        x0=df.index[0],
+        y0=100,
+        x1=df.index[-1],
+        y1=100,
+        line=dict(
+            color='Red',
+            width=2,
+            dash='dash',
         )
-    elif graph_type == 'rsi':
-        fig.add_trace(go.Scatter(x=df.index, y=df['RSI'], mode='lines', name='RSI'))
-        fig.add_shape(
-            type='line',
-            x0=df.index[0],
-            y0=70,
-            x1=df.index[-1],
-            y1=70,
-            line=dict(
-                color='Red',
-                width=2,
-                dash='dash',
-            )
+    )
+    cci_fig.add_shape(
+        type='line',
+        x0=df.index[0],
+        y0=-100,
+        x1=df.index[-1],
+        y1=-100,
+        line=dict(
+            color='Green',
+            width=2,
+            dash='dash',
         )
-        fig.add_shape(
-            type='line',
-            x0=df.index[0],
-            y0=30,
-            x1=df.index[-1],
-            y1=30,
-            line=dict(
-                color='Green',
-                width=2,
-                dash='dash',
-            )
+    )
+    cci_fig.update_layout(
+        title=f'{ticker} Commodity Channel Index',
+        yaxis_title='CCI',
+        xaxis_title='Date',
+        template='plotly_dark'
+    )
+
+    # Money Flow Index (MFI) Chart
+    mfi_fig = go.Figure(go.Scatter(x=df.index, y=df['MFI'], mode='lines', name='MFI'))
+    mfi_fig.add_shape(
+        type='line',
+        x0=df.index[0],
+        y0=80,
+        x1=df.index[-1],
+        y1=80,
+        line=dict(
+            color='Red',
+            width=2,
+            dash='dash',
         )
-        fig.update_layout(
-            title=f'{ticker} RSI',
-            yaxis_title='RSI',
-            xaxis_title='Date',
-            template='plotly_dark'
+    )
+    mfi_fig.add_shape(
+        type='line',
+        x0=df.index[0],
+        y0=20,
+        x1=df.index[-1],
+        y1=20,
+        line=dict(
+            color='Green',
+            width=2,
+            dash='dash',
         )
-    elif graph_type == 'bollinger-bands':
-        fig.add_trace(go.Scatter(x=df.index, y=df['Close'], mode='lines', name='Close Price'))
-        fig.add_trace(go.Scatter(x=df.index, y=df['Upper_band'], mode='lines', name='Upper Band'))
-        fig.add_trace(go.Scatter(x=df.index, y=df['Lower_band'], mode='lines', name='Lower Band'))
-        fig.update_layout(
-            title=f'{ticker} Bollinger Bands',
-            yaxis_title='Stock Price (USD)',
-            xaxis_title='Date',
-            template='plotly_dark'
+    )
+    mfi_fig.update_layout(
+        title=f'{ticker} Money Flow Index',
+        yaxis_title='MFI',
+        xaxis_title='Date',
+        template='plotly_dark'
+    )
+
+    # Chaikin Money Flow (CMF) Chart
+    cmf_fig = go.Figure(go.Scatter(x=df.index, y=df['CMF'], mode='lines', name='CMF'))
+    cmf_fig.add_shape(
+        type='line',
+        x0=df.index[0],
+        y0=0,
+        x1=df.index[-1],
+        y1=0,
+        line=dict(
+            color='Red',
+            width=2,
+            dash='dash',
         )
-    elif graph_type == 'macd':
-        fig.add_trace(go.Scatter(x=df.index, y=df['MACD'], mode='lines', name='MACD'))
-        fig.add_trace(go.Scatter(x=df.index, y=df['MACD_Signal'], mode='lines', name='MACD Signal'))
-        fig.update_layout(
-            title=f'{ticker} MACD',
-            yaxis_title='MACD',
-            xaxis_title='Date',
-            template='plotly_dark'
+    )
+    cmf_fig.update_layout(
+        title=f'{ticker} Chaikin Money Flow',
+        yaxis_title='CMF',
+        xaxis_title='Date',
+        template='plotly_dark'
+    )
+
+    # Force Index (FI) Chart
+    fi_fig = go.Figure(go.Scatter(x=df.index, y=df['FI'], mode='lines', name='FI'))
+    fi_fig.add_shape(
+        type='line',
+        x0=df.index[0],
+        y0=0,
+        x1=df.index[-1],
+        y1=0,
+        line=dict(
+            color='Red',
+            width=2,
+            dash='dash',
         )
-    elif graph_type == 'stochastic oscillator':
-        fig.add_trace(go.Scatter(x=df.index, y=df['%K'], mode='lines', name='%K'))
-        fig.add_trace(go.Scatter(x=df.index, y=df['%D'], mode='lines', name='%D'))
-        fig.update_layout(
-            title=f'{ticker} Stochastic Oscillator',
-            yaxis_title='Stochastic Oscillator',
-            xaxis_title='Date',
-            template='plotly_dark'
-        )
-    elif graph_type == 'OBV':
-        fig.add_trace(go.Scatter(x=df.index, y=df['OBV'], mode='lines', name='OBV'))
-        fig.update_layout(
-            title=f'{ticker} On-Balance Volume',
-            yaxis_title='OBV',
-            xaxis_title='Date',
-            template='plotly_dark'
-        )    
-    elif graph_type == 'ATR':
-        fig.add_trace(go.Scatter(x=df.index, y=df['ATR'], mode='lines', name='ATR'))
-        fig.update_layout(
-            title=f'{ticker} Average True Range',
-            yaxis_title='ATR',
-            xaxis_title='Date',
-            template='plotly_dark'
-        )    
-    elif graph_type == 'CCI':
-        fig.add_trace(go.Scatter(x=df.index, y=df['CCI'], mode='lines', name='CCI'))
-        fig.add_shape(
-            type='line',
-            x0=df.index[0],
-            y0=100,
-            x1=df.index[-1],
-            y1=100,
-            line=dict(
-                color='Red',
-                width=2,
-                dash='dash',
-            )
-        )
-        fig.add_shape(
-            type='line',
-            x0=df.index[0],
-            y0=-100,
-            x1=df.index[-1],
-            y1=-100,
-            line=dict(
-                color='Green',
-                width=2,
-                dash='dash',
-            )
-        )
-        fig.update_layout(
-            title=f'{ticker} Commodity Channel Index',
-            yaxis_title='CCI',
-            xaxis_title='Date',
-            template='plotly_dark'
-        )
-    elif graph_type == 'MFI':
-        fig.add_trace(go.Scatter(x=df.index, y=df['MFI'], mode='lines', name='MFI'))
-        fig.add_shape(
-            type='line',
-            x0=df.index[0],
-            y0=80,
-            x1=df.index[-1],
-            y1=80,
-            line=dict(
-                color='Red',
-                width=2,
-                dash='dash',
-            )
-        )
-        fig.add_shape(
-            type='line',
-            x0=df.index[0],
-            y0=20,
-            x1=df.index[-1],
-            y1=20,
-            line=dict(
-                color='Green',
-                width=2,
-                dash='dash',
-            )
-        )
-        fig.update_layout(
-            title=f'{ticker} Money Flow Index',
-            yaxis_title='MFI',
-            xaxis_title='Date',
-            template='plotly_dark'
-        )
-    elif graph_type == 'CMF':
-        fig.add_trace(go.Scatter(x=df.index, y=df['CMF'], mode='lines', name='CMF'))
-        fig.add_shape(
-            type='line',
-            x0=df.index[0],
-            y0=0,
-            x1=df.index[-1],
-            y1=0,
-            line=dict(
-                color='Red',
-                width=2,
-                dash='dash',
-            )
-        )
-        fig.update_layout(
-            title=f'{ticker} Chaikin Money Flow',
-            yaxis_title='CMF',
-            xaxis_title='Date',
-            template='plotly_dark'
-        )
-    elif graph_type == 'FI':
-        fig.add_trace(go.Scatter(x=df.index, y=df['FI'], mode='lines', name='FI'))
-        fig.add_shape(
-            type='line',
-            x0=df.index[0],
-            y0=0,
-            x1=df.index[-1],
-            y1=0,
-            line=dict(
-                color='Red',
-                width=2,
-                dash='dash',
-            )
-        )
-        fig.update_layout(
-            title=f'{ticker} Force Index',
-            yaxis_title='FI',
-            xaxis_title='Date',
-            template='plotly_dark'
-        )
-    elif graph_type == 'fibonacci-retracement':
-        fig.add_trace(go.Scatter(x=df.index, y=df['Close'], mode='lines', name='Close Price'))
-        for level in levels:
-            fig.add_trace(go.Scatter(x=[df.index[0], df.index[-1]], y=[levels[level], levels[level]],
+    )
+    fi_fig.update_layout(
+        title=f'{ticker} Force Index',
+        yaxis_title='FI',
+        xaxis_title='Date',
+        template='plotly_dark'
+    )
+
+    # Fibonacci Retracement Chart
+    fibonacci_retracement_fig = go.Figure(go.Scatter(x=df.index, y=df['Close'], mode='lines', name='Close Price'))
+    for level in levels:
+        fibonacci_retracement_fig.add_trace(go.Scatter(x=[df.index[0], df.index[-1]], y=[levels[level], levels[level]],
                                      mode='lines', name=f'Fibonacci {level}', line=dict(dash='dash')))
-        fig.update_layout(
-            title=f'{ticker} Fibonacci Retracement',
-            yaxis_title='Stock Price (USD)',
-            xaxis_title='Date',
-            template='plotly_dark'
-        )
-    elif graph_type == 'ichimoku-cloud':
-        fig.add_trace(go.Scatter(x=df.index, y=df['Close'], mode='lines', name='Close Price'))
-        fig.add_trace(go.Scatter(x=df.index, y=df['Tenkan_sen'], mode='lines', name='Tenkan-sen'))
-        fig.add_trace(go.Scatter(x=df.index, y=df['Kijun_sen'], mode='lines', name='Kijun-sen'))
-        fig.add_trace(go.Scatter(x=df.index, y=df['Senkou_span_a'], mode='lines', name='Senkou Span A'))
-        fig.add_trace(go.Scatter(x=df.index, y=df['Senkou_span_b'], mode='lines', name='Senkou Span B'))
-        fig.add_trace(go.Scatter(x=df.index, y=df['Chikou_span'], mode='lines', name='Chikou Span'))
+    fibonacci_retracement_fig.update_layout(
+        title=f'{ticker} Fibonacci Retracement',
+        yaxis_title='Stock Price (USD)',
+        xaxis_title='Date',
+        template='plotly_dark'
+    )
 
-        fig.update_layout(
-            title=f'{ticker} Ichimoku Cloud',
-            yaxis_title='Stock Price (USD)',
-            xaxis_title='Date',
-            template='plotly_dark'
-        )
-    elif graph_type == 'vwap':
-        fig.add_trace(go.Scatter(x=df.index, y=df['Close'], mode='lines', name='Close Price'))
-        fig.add_trace(go.Scatter(x=df.index, y=df['VWAP'], mode='lines', name='VWAP'))
-        fig.update_layout(
-            title=f'{ticker} VWAP',
-            yaxis_title='Stock Price (USD)',
-            xaxis_title='Date',
-            template='plotly_dark'
-        )
-    elif graph_type == 'adl':
-        fig.add_trace(go.Scatter(x=df.index, y=df['ADL'], mode='lines', name='ADL'))
-        fig.add_trace(go.Scatter(x=df.index, y=df['SMA_ADL_20'], mode='lines', name='SMA ADL 20'))
-        fig.add_trace(go.Scatter(x=df.index, y=df['SMA_ADL_50'], mode='lines', name='SMA ADL 50'))
-        fig.add_trace(go.Scatter(x=df.index, y=df['SMA_ADL_200'], mode='lines', name='SMA ADL 200'))
-        fig.update_layout(
-            title=f'{ticker} ADL & SMA ADL',
-            yaxis_title='ADL',
-            xaxis_title='Date',
-            template='plotly_dark'
-        )
-    elif graph_type == 'adx-di':
-        fig.add_trace(go.Scatter(x=df.index, y=df['ADX'], mode='lines', name='ADX'))
-        fig.add_trace(go.Scatter(x=df.index, y=df['DI+'], mode='lines', name='DI+'))
-        fig.add_trace(go.Scatter(x=df.index, y=df['DI-'], mode='lines', name='DI-'))
-        fig.update_layout(
-            title=f'{ticker} ADX & DI',
-            yaxis_title='Indicator',
-            xaxis_title='Date',
-            template='plotly_dark'
-        )
+    # Ichimoku Cloud Chart
+    ichimoku_cloud_fig = go.Figure(go.Scatter(x=df.index, y=df['Close'], mode='lines', name='Close Price'))
+    ichimoku_cloud_fig.add_trace(go.Scatter(x=df.index, y=df['Tenkan_sen'], mode='lines', name='Tenkan-sen'))
+    ichimoku_cloud_fig.add_trace(go.Scatter(x=df.index, y=df['Kijun_sen'], mode='lines', name='Kijun-sen'))
+    ichimoku_cloud_fig.add_trace(go.Scatter(x=df.index, y=df['Senkou_span_a'], mode='lines', name='Senkou Span A'))
+    ichimoku_cloud_fig.add_trace(go.Scatter(x=df.index, y=df['Senkou_span_b'], mode='lines', name='Senkou Span B'))
+    ichimoku_cloud_fig.add_trace(go.Scatter(x=df.index, y=df['Chikou_span'], mode='lines', name='Chikou Span'))
+    ichimoku_cloud_fig.update_layout(
+        title=f'{ticker} Ichimoku Cloud',
+        yaxis_title='Stock Price (USD)',
+        xaxis_title='Date',
+        template='plotly_dark'
+    )
 
-    return fig
+    # VWAP Chart
+    vwap_fig = go.Figure(go.Scatter(x=df.index, y=df['Close'], mode='lines', name='Close Price'))
+    vwap_fig.add_trace(go.Scatter(x=df.index, y=df['VWAP'], mode='lines', name='VWAP'))
+    vwap_fig.update_layout(
+        title=f'{ticker} VWAP',
+        yaxis_title='Stock Price (USD)',
+        xaxis_title='Date',
+        template='plotly_dark'
+    )
+
+    # ADL & SMA ADL Chart
+    adl_fig = go.Figure()
+    adl_fig.add_trace(go.Scatter(x=df.index, y=df['ADL'], mode='lines', name='ADL'))
+    adl_fig.add_trace(go.Scatter(x=df.index, y=df['SMA_ADL_20'], mode='lines', name='SMA ADL 20'))
+    adl_fig.add_trace(go.Scatter(x=df.index, y=df['SMA_ADL_50'], mode='lines', name='SMA ADL 50'))
+    adl_fig.add_trace(go.Scatter(x=df.index, y=df['SMA_ADL_200'], mode='lines', name='SMA ADL 200'))
+    adl_fig.update_layout(
+        title=f'{ticker} ADL & SMA ADL',
+        yaxis_title='ADL',
+        xaxis_title='Date',
+        template='plotly_dark'
+    )
+
+    # ADX & DI Chart
+    adx_di_fig = go.Figure()
+    adx_di_fig.add_trace(go.Scatter(x=df.index, y=df['ADX'], mode='lines', name='ADX'))
+    adx_di_fig.add_trace(go.Scatter(x=df.index, y=df['DI+'], mode='lines', name='DI+'))
+    adx_di_fig.add_trace(go.Scatter(x=df.index, y=df['DI-'], mode='lines', name='DI-'))
+    adx_di_fig.update_layout(
+        title=f'{ticker} ADX & DI',
+        yaxis_title='Indicator',
+        xaxis_title='Date',
+        template='plotly_dark'
+    )
+
+    return (candlestick_fig, sma_ema_fig, support_resistance_fig, rsi_fig, bollinger_bands_fig, macd_fig, stochastic_oscillator_fig,
+            obv_fig, atr_fig, cci_fig, mfi_fig, cmf_fig, fi_fig, fibonacci_retracement_fig, ichimoku_cloud_fig, vwap_fig, adl_fig, adx_di_fig)
 
 # Run the app
 if __name__ == '__main__':
