@@ -1,3 +1,4 @@
+
 import dash
 from dash import dcc, html
 from dash.dependencies import Input, Output
@@ -18,15 +19,33 @@ app.layout = dbc.Container([
     dbc.NavbarSimple(
         brand="Stock Dashboard",
         brand_href="#",
-        color="drak brown",
+        color="dark brown",  # Fixed typo here
         dark=True,
     ),
     dbc.Row([
         dbc.Col([
             dbc.InputGroup([
-                dbc.Input(id='stock-input', placeholder='Enter stock symbol', value='1303', debounce=True),
-                dbc.InputGroupText('.SR'),
+                dbc.Input(id='stock-input', placeholder='Enter stock symbol', value='1303', debounce=False),
+                dbc.InputGroupText(''),
             ]),
+        ], width=4),
+    ], justify='center', className="my-3"),
+    
+    dbc.Row([
+        dbc.Col([
+            dbc.Label("Select Time Range:"),
+            dcc.Dropdown(
+                id='time-range',
+                options=[
+                    {'label': '6 months', 'value': '6mo'},
+                    {'label': '1 year', 'value': '1y'},
+                    {'label': '2 years', 'value': '2y'},
+                    {'label': '3 years', 'value': '3y'},
+                    {'label': 'All', 'value': 'max'}
+                ],
+                value='1y',  # default value
+                clearable=False
+            )
         ], width=4),
     ], justify='center', className="my-3"),
     
@@ -213,14 +232,15 @@ app.layout = dbc.Container([
      Output('vwap-chart', 'figure'),
      Output('adl-chart', 'figure'),
      Output('adx-di-chart', 'figure')],
-    [Input('stock-input', 'value')]
+    [Input('stock-input', 'value'), Input('time-range', 'value')]  # Added time_range input
 )
-def update_graphs(ticker):
+def update_graphs(ticker, time_range):
     # Check if the ticker is an integer, append '.SR' if it is
     if ticker.isdigit():
         ticker += '.SR'
 
-    df = yf.download(ticker)
+    # Fetch stock data with the selected time range
+    df = yf.download(ticker, period=time_range)
     df['SMA_20'] = df['Close'].rolling(window=20).mean()
     df['SMA_50'] = df['Close'].rolling(window=50).mean()
     df['SMA_200'] = df['Close'].rolling(window=200).mean()
@@ -307,7 +327,7 @@ def update_graphs(ticker):
     candlestick_fig.add_trace(go.Bar(x=df.index, y=df['Volume'], name='Volume', marker_color='rgba(52, 152, 219, 0.5)', yaxis='y2'))
     candlestick_fig.update_layout(
         title=f'{ticker} Candlestick Chart',
-        yaxis_title='Stock Price)',
+        yaxis_title='Stock Price',
         xaxis_title='Date',
         template='plotly_dark',
         yaxis2=dict(title='Volume', overlaying='y', side='right')
@@ -588,8 +608,8 @@ def update_graphs(ticker):
     # ADX & DI Chart
     adx_di_fig = go.Figure()
     adx_di_fig.add_trace(go.Scatter(x=df.index, y=df['ADX'], mode='lines', name='ADX'))
-    adx_di_fig.add_trace(go.Scatter(x=df.index, y=df['DI+'], mode='lines', name='DI+'))
     adx_di_fig.add_trace(go.Scatter(x=df.index, y=df['DI-'], mode='lines', name='DI-'))
+    adx_di_fig.add_trace(go.Scatter(x=df.index, y=df['DI+'], mode='lines', name='DI+'))
     adx_di_fig.update_layout(
         title=f'{ticker} ADX & DI',
         yaxis_title='Indicator',
