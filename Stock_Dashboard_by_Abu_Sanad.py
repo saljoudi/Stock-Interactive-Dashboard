@@ -24,7 +24,7 @@ app.layout = dbc.Container([
     dbc.Row([
         dbc.Col([
             dbc.InputGroup([
-                dbc.Input(id='stock-input', placeholder='Enter stock symbol', value='1303', debounce=False),
+                dbc.Input(id='stock-input', placeholder='Enter stock symbol', value='AAPL', debounce=False),
                 dbc.InputGroupText(''),
             ]),
         ], width=4),
