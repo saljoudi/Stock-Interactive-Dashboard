@@ -1,4 +1,3 @@
-
 import dash
 from dash import dcc, html
 from dash.dependencies import Input, Output
@@ -205,6 +204,38 @@ app.layout = dbc.Container([
         ], width=6),
     ], className="mb-4"),
 
+    # Explanation of Metrics Section
+    dbc.Row([
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    html.H4("Explanation of Metrics", className="card-title"),
+                    html.Ul([
+                        html.Li("Candlestick Chart: Displays the open, high, low, and close prices of a security for a specific time period."),
+                        html.Li("SMA (Simple Moving Average): The average stock price over a specific time period, smoothing price data."),
+                        html.Li("EMA (Exponential Moving Average): A moving average that reacts more quickly to recent price changes."),
+                        html.Li("Support & Resistance: Price levels where a stock tends to reverse direction."),
+                        html.Li("RSI (Relative Strength Index): Measures the speed and change of price movements. Values over 70 indicate overbought, under 30 indicate oversold."),
+                        html.Li("Bollinger Bands: Uses standard deviations to measure volatility and relative price levels."),
+                        html.Li("MACD (Moving Average Convergence Divergence): Shows the relationship between two moving averages to detect momentum."),
+                        html.Li("Stochastic Oscillator: Compares closing prices to their price range over time to indicate overbought/oversold conditions."),
+                        html.Li("OBV (On-Balance Volume): A volume-based indicator predicting price movement based on cumulative volume."),
+                        html.Li("ATR (Average True Range): Measures volatility by averaging the true range of stock prices over time."),
+                        html.Li("CCI (Commodity Channel Index): Identifies cyclical trends by comparing current prices to historical averages."),
+                        html.Li("MFI (Money Flow Index): Combines price and volume to indicate buying and selling pressure."),
+                        html.Li("CMF (Chaikin Money Flow): Measures buying and selling pressure over time, indicating accumulation or distribution."),
+                        html.Li("FI (Force Index): Combines price and volume to show the strength of buy/sell signals."),
+                        html.Li("Fibonacci Retracement: Predicts potential reversal levels by using high and low price points."),
+                        html.Li("Ichimoku Cloud: Defines support, resistance, trend direction, and momentum using various components."),
+                        html.Li("VWAP (Volume Weighted Average Price): A benchmark that shows the average price weighted by volume."),
+                        html.Li("ADL (Accumulation/Distribution Line): A cumulative indicator to assess whether a stock is being accumulated or distributed."),
+                        html.Li("ADX & DI: Measures trend strength and direction using the Average Directional Index and Directional Indicators."),
+                    ], className="text-muted")
+                ])
+            ])
+        ], width=12)
+    ], className="mb-4"),
+    
     dbc.Row([
         dbc.Col([
             html.Footer("Stock Dashboard © 2024 By Salman", className="text-center text-muted")
