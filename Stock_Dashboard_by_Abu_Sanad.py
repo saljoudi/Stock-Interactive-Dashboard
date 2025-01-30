@@ -18,7 +18,7 @@ app.layout = dbc.Container([
     dbc.NavbarSimple(
         brand="Stock Dashboard",
         brand_href="#",
-        color="dark brown",
+        color="dark brown",  # Fixed typo here
         dark=True,
     ),
     dbc.Row([
@@ -43,21 +43,6 @@ app.layout = dbc.Container([
                     {'label': 'All', 'value': 'max'}
                 ],
                 value='1y',  # default value
-                clearable=False
-            )
-        ], width=4),
-        dbc.Col([
-            dbc.Label("Select Interval:"),
-            dcc.Dropdown(
-                id='interval',
-                options=[
-
-                    {'label': '1 Hour', 'value': '1h'},
-                    {'label': '1 Day', 'value': '1d'},
-                    {'label': '1 Week', 'value': '1wk'},
-                    {'label': '1 Month', 'value': '1mo'}
-                ],
-                value='1d',  # default value
                 clearable=False
             )
         ], width=4),
@@ -278,19 +263,15 @@ app.layout = dbc.Container([
      Output('vwap-chart', 'figure'),
      Output('adl-chart', 'figure'),
      Output('adx-di-chart', 'figure')],
-    [Input('stock-input', 'value'), 
-     Input('time-range', 'value'),
-     Input('interval', 'value')]  # Added interval input
+    [Input('stock-input', 'value'), Input('time-range', 'value')]  # Added time_range input
 )
-def update_graphs(ticker, time_range, interval):
+def update_graphs(ticker, time_range):
     # Check if the ticker is an integer, append '.SR' if it is
     if ticker.isdigit():
         ticker += '.SR'
 
-    # Fetch stock data with the selected time range and interval
-    df = yf.download(ticker, period=time_range, interval=interval)
-    
-    # Calculate technical indicators
+    # Fetch stock data with the selected time range
+    df = yf.download(ticker, period=time_range)
     df['SMA_20'] = df['Close'].rolling(window=20).mean()
     df['SMA_50'] = df['Close'].rolling(window=50).mean()
     df['SMA_200'] = df['Close'].rolling(window=200).mean()
@@ -306,17 +287,17 @@ def update_graphs(ticker, time_range, interval):
     df['Support_2'] = pivot_point - (df['High'] - df['Low'])
     df['Resistance_2'] = pivot_point + (df['High'] - df['Low'])
 
-    df['RSI'] = ta.momentum.RSIIndicator(df['Close'], window=14).rsi()
+    df['RSI'] = ta.momentum.RSIIndicator(df['Close'], window=50).rsi()
 
-    df['20_day_ma'] = df['Close'].rolling(window=20).mean()
-    df['20_day_std'] = df['Close'].rolling(window=20).std()
-    df['Upper_band'] = df['20_day_ma'] + (df['20_day_std'] * 2)
-    df['Lower_band'] = df['20_day_ma'] - (df['20_day_std'] * 2)
+    df['20_day_ma'] = df['Close'].rolling(window=20).mean().round(2)
+    df['20_day_std'] = df['Close'].rolling(window=20).std().round(2)
+    df['Upper_band'] = df['20_day_ma'] + (df['20_day_std']*2).round(2)
+    df['Lower_band'] = df['20_day_ma'] - (df['20_day_std']*2).round(2)
     
-    exp1 = df['Close'].ewm(span=12, adjust=False).mean()
-    exp2 = df['Close'].ewm(span=26, adjust=False).mean()
+    exp1 = df['Close'].ewm(span=12, adjust=False).mean().round(2)
+    exp2 = df['Close'].ewm(span=26, adjust=False).mean().round(2)
     macd = exp1 - exp2
-    signal = macd.ewm(span=9, adjust=False).mean()
+    signal = macd.ewm(span=9, adjust=False).mean().round(2)
     df['MACD'] = macd
     df['MACD_Signal'] = signal
 
@@ -386,6 +367,9 @@ def update_graphs(ticker, time_range, interval):
     # SMA & EMA Chart
     sma_ema_fig = go.Figure()
     sma_ema_fig.add_trace(go.Scatter(x=df.index, y=df['Close'], mode='lines', name='Close'))
+    sma_ema_fig.add_trace(go.Scatter(x=df.index, y=df['SMA_20'], mode='lines', name='SMA 20'))
+    sma_ema_fig.add_trace(go.Scatter(x=df.index, y=df['SMA_50'], mode='lines', name='SMA 50'))
+    sma_ema_fig.add_trace(go.Scatter(x=df.index, y=df['SMA_200'], mode='lines', name='SMA 200'))
     sma_ema_fig.add_trace(go.Scatter(x=df.index, y=df['EMA_20'], mode='lines', name='EMA 20'))
     sma_ema_fig.add_trace(go.Scatter(x=df.index, y=df['EMA_50'], mode='lines', name='EMA 50'))
     sma_ema_fig.add_trace(go.Scatter(x=df.index, y=df['EMA_200'], mode='lines', name='EMA 200'))
@@ -669,4 +653,5 @@ def update_graphs(ticker, time_range, interval):
 
 # Run the app
 if __name__ == '__main__':
-    app.run_server(debug=True) 
+    app.run_server(debug=True)
+    #OLD
