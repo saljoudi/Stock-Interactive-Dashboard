@@ -6,3 +6,5 @@ plotly
 ta 
 dash_bootstrap_components
 gunicorn
+joblib
+yahooquery
