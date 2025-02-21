@@ -1,7 +1,7 @@
 import dash
 from dash import dcc, html
 from dash.dependencies import Input, Output
-import yfinance as yf
+from yahooquery import Ticker  # Changed from yfinance import yf
 import plotly.graph_objs as go
 import pandas as pd
 import ta
@@ -18,7 +18,7 @@ app.layout = dbc.Container([
     dbc.NavbarSimple(
         brand="Stock Dashboard",
         brand_href="#",
-        color="dark brown",  # Fixed typo here
+        color="dark brown",
         dark=True,
     ),
     dbc.Row([
@@ -42,7 +42,7 @@ app.layout = dbc.Container([
                     {'label': '5 years', 'value': '5y'},
                     {'label': 'All', 'value': 'max'}
                 ],
-                value='1y',  # default value
+                value='1y',
                 clearable=False
             )
         ], width=4),
@@ -263,73 +263,79 @@ app.layout = dbc.Container([
      Output('vwap-chart', 'figure'),
      Output('adl-chart', 'figure'),
      Output('adx-di-chart', 'figure')],
-    [Input('stock-input', 'value'), Input('time-range', 'value')]  # Added time_range input
+    [Input('stock-input', 'value'), Input('time-range', 'value')]
 )
 def update_graphs(ticker, time_range):
-    # Check if the ticker is an integer, append '.SR' if it is
+    # Append '.SR' if the ticker is an integer
     if ticker.isdigit():
         ticker += '.SR'
+    
+    # Fetch stock data using yahooquery
+    tq = Ticker(ticker)
+    df = tq.history(period=time_range)
+    # Adjust index if it is a MultiIndex (with symbol and date)
+    if isinstance(df.index, pd.MultiIndex):
+        df.index = df.index.get_level_values('date')
+    
+    # Calculate SMAs and EMAs
+    df['SMA_20'] = df['close'].rolling(window=20).mean()
+    df['SMA_50'] = df['close'].rolling(window=50).mean()
+    df['SMA_200'] = df['close'].rolling(window=200).mean()
 
-    # Fetch stock data with the selected time range
-    df = yf.download(ticker, period=time_range)
-    df['SMA_20'] = df['Close'].rolling(window=20).mean()
-    df['SMA_50'] = df['Close'].rolling(window=50).mean()
-    df['SMA_200'] = df['Close'].rolling(window=200).mean()
+    df['EMA_20'] = df['close'].ewm(span=20, adjust=False).mean()
+    df['EMA_50'] = df['close'].ewm(span=50, adjust=False).mean()
+    df['EMA_200'] = df['close'].ewm(span=200, adjust=False).mean()
 
-    df['EMA_20'] = df['Close'].ewm(span=20, adjust=False).mean()
-    df['EMA_50'] = df['Close'].ewm(span=50, adjust=False).mean()
-    df['EMA_200'] = df['Close'].ewm(span=200, adjust=False).mean()
-
-    pivot_point = (df['High'] + df['Low'] + df['Close']) / 3
+    pivot_point = (df['high'] + df['low'] + df['close']) / 3
     df['Pivot_Point'] = pivot_point
-    df['Support_1'] = 2 * pivot_point - df['High']
-    df['Resistance_1'] = 2 * pivot_point - df['Low']
-    df['Support_2'] = pivot_point - (df['High'] - df['Low'])
-    df['Resistance_2'] = pivot_point + (df['High'] - df['Low'])
+    df['Support_1'] = 2 * pivot_point - df['high']
+    df['Resistance_1'] = 2 * pivot_point - df['low']
+    df['Support_2'] = pivot_point - (df['high'] - df['low'])
+    df['Resistance_2'] = pivot_point + (df['high'] - df['low'])
 
-    df['RSI'] = ta.momentum.RSIIndicator(df['Close'], window=50).rsi()
+    df['RSI'] = ta.momentum.RSIIndicator(df['close'], window=50).rsi()
 
-    df['20_day_ma'] = df['Close'].rolling(window=20).mean().round(2)
-    df['20_day_std'] = df['Close'].rolling(window=20).std().round(2)
+    df['20_day_ma'] = df['close'].rolling(window=20).mean().round(2)
+    df['20_day_std'] = df['close'].rolling(window=20).std().round(2)
     df['Upper_band'] = df['20_day_ma'] + (df['20_day_std']*2).round(2)
     df['Lower_band'] = df['20_day_ma'] - (df['20_day_std']*2).round(2)
     
-    exp1 = df['Close'].ewm(span=12, adjust=False).mean().round(2)
-    exp2 = df['Close'].ewm(span=26, adjust=False).mean().round(2)
+    exp1 = df['close'].ewm(span=12, adjust=False).mean().round(2)
+    exp2 = df['close'].ewm(span=26, adjust=False).mean().round(2)
     macd = exp1 - exp2
     signal = macd.ewm(span=9, adjust=False).mean().round(2)
     df['MACD'] = macd
     df['MACD_Signal'] = signal
 
-    stoch = ta.momentum.StochasticOscillator(df['High'], df['Low'], df['Close'])
+    stoch = ta.momentum.StochasticOscillator(df['high'], df['low'], df['close'])
     df['%K'] = stoch.stoch()
     df['%D'] = stoch.stoch_signal()
-    df['OBV'] = ta.volume.OnBalanceVolumeIndicator(df['Close'], df['Volume']).on_balance_volume()
+    df['OBV'] = ta.volume.OnBalanceVolumeIndicator(df['close'], df['volume']).on_balance_volume()
 
-    df['VWAP'] = (df['Close'] * df['Volume']).cumsum() / df['Volume'].cumsum()
+    df['VWAP'] = (df['close'] * df['volume']).cumsum() / df['volume'].cumsum()
 
-    df['ATR'] = ta.volatility.AverageTrueRange(df['High'], df['Low'], df['Close']).average_true_range()
+    df['ATR'] = ta.volatility.AverageTrueRange(df['high'], df['low'], df['close']).average_true_range()
 
-    df['CCI'] = ta.trend.CCIIndicator(df['High'], df['Low'], df['Close']).cci()
+    df['CCI'] = ta.trend.CCIIndicator(df['high'], df['low'], df['close']).cci()
     
-    df['ADL'] = ta.volume.AccDistIndexIndicator(df['High'], df['Low'], df['Close'], df['Volume']).acc_dist_index()
+    df['ADL'] = ta.volume.AccDistIndexIndicator(df['high'], df['low'], df['close'], df['volume']).acc_dist_index()
     df['SMA_ADL_20'] = df['ADL'].rolling(window=20).mean()
     df['SMA_ADL_50'] = df['ADL'].rolling(window=50).mean()
     df['SMA_ADL_200'] = df['ADL'].rolling(window=200).mean()
 
-    df['MFI'] = ta.volume.MFIIndicator(df['High'], df['Low'], df['Close'], df['Volume']).money_flow_index()
-    df['CMF'] = ta.volume.ChaikinMoneyFlowIndicator(df['High'], df['Low'], df['Close'], df['Volume'], window=20).chaikin_money_flow()
-    df['FI'] = ta.volume.ForceIndexIndicator(df['Close'], df['Volume']).force_index()
+    df['MFI'] = ta.volume.MFIIndicator(df['high'], df['low'], df['close'], df['volume']).money_flow_index()
+    df['CMF'] = ta.volume.ChaikinMoneyFlowIndicator(df['high'], df['low'], df['close'], df['volume'], window=20).chaikin_money_flow()
+    df['FI'] = ta.volume.ForceIndexIndicator(df['close'], df['volume']).force_index()
 
     # Calculate ADX and DI+ and DI-
-    adx_indicator = ta.trend.ADXIndicator(df['High'], df['Low'], df['Close'])
+    adx_indicator = ta.trend.ADXIndicator(df['high'], df['low'], df['close'])
     df['ADX'] = adx_indicator.adx()
     df['DI+'] = adx_indicator.adx_pos()
     df['DI-'] = adx_indicator.adx_neg()
 
     # Calculate Fibonacci retracement levels
-    max_price = df['High'].max()
-    min_price = df['Low'].min()
+    max_price = df['high'].max()
+    min_price = df['low'].min()
     diff = max_price - min_price
 
     levels = {
@@ -342,20 +348,20 @@ def update_graphs(ticker, time_range):
     }
 
     # Calculate Ichimoku Cloud components
-    df['Tenkan_sen'] = (df['High'].rolling(window=9).max() + df['Low'].rolling(window=9).min()) / 2
-    df['Kijun_sen'] = (df['High'].rolling(window=26).max() + df['Low'].rolling(window=26).min()) / 2
+    df['Tenkan_sen'] = (df['high'].rolling(window=9).max() + df['low'].rolling(window=9).min()) / 2
+    df['Kijun_sen'] = (df['high'].rolling(window=26).max() + df['low'].rolling(window=26).min()) / 2
     df['Senkou_span_a'] = ((df['Tenkan_sen'] + df['Kijun_sen']) / 2).shift(26)
-    df['Senkou_span_b'] = ((df['High'].rolling(window=52).max() + df['Low'].rolling(window=52).min()) / 2).shift(26)
-    df['Chikou_span'] = df['Close'].shift(-26)
+    df['Senkou_span_b'] = ((df['high'].rolling(window=52).max() + df['low'].rolling(window=52).min()) / 2).shift(26)
+    df['Chikou_span'] = df['close'].shift(-26)
 
     # Candlestick Chart
     candlestick_fig = go.Figure(go.Candlestick(x=df.index,
-                                               open=df['Open'],
-                                               high=df['High'],
-                                               low=df['Low'],
-                                               close=df['Close'],
+                                               open=df['open'],
+                                               high=df['high'],
+                                               low=df['low'],
+                                               close=df['close'],
                                                name='Candlestick'))
-    candlestick_fig.add_trace(go.Bar(x=df.index, y=df['Volume'], name='Volume', marker_color='rgba(52, 152, 219, 0.5)', yaxis='y2'))
+    candlestick_fig.add_trace(go.Bar(x=df.index, y=df['volume'], name='Volume', marker_color='rgba(52, 152, 219, 0.5)', yaxis='y2'))
     candlestick_fig.update_layout(
         title=f'{ticker} Candlestick Chart',
         yaxis_title='Stock Price',
@@ -366,7 +372,7 @@ def update_graphs(ticker, time_range):
 
     # SMA & EMA Chart
     sma_ema_fig = go.Figure()
-    sma_ema_fig.add_trace(go.Scatter(x=df.index, y=df['Close'], mode='lines', name='Close'))
+    sma_ema_fig.add_trace(go.Scatter(x=df.index, y=df['close'], mode='lines', name='Close'))
     sma_ema_fig.add_trace(go.Scatter(x=df.index, y=df['SMA_20'], mode='lines', name='SMA 20'))
     sma_ema_fig.add_trace(go.Scatter(x=df.index, y=df['SMA_50'], mode='lines', name='SMA 50'))
     sma_ema_fig.add_trace(go.Scatter(x=df.index, y=df['SMA_200'], mode='lines', name='SMA 200'))
@@ -429,7 +435,7 @@ def update_graphs(ticker, time_range):
 
     # Bollinger Bands Chart
     bollinger_bands_fig = go.Figure()
-    bollinger_bands_fig.add_trace(go.Scatter(x=df.index, y=df['Close'], mode='lines', name='Close Price'))
+    bollinger_bands_fig.add_trace(go.Scatter(x=df.index, y=df['close'], mode='lines', name='Close Price'))
     bollinger_bands_fig.add_trace(go.Scatter(x=df.index, y=df['Upper_band'], mode='lines', name='Upper Band'))
     bollinger_bands_fig.add_trace(go.Scatter(x=df.index, y=df['Lower_band'], mode='lines', name='Lower Band'))
     bollinger_bands_fig.update_layout(
@@ -588,7 +594,7 @@ def update_graphs(ticker, time_range):
     )
 
     # Fibonacci Retracement Chart
-    fibonacci_retracement_fig = go.Figure(go.Scatter(x=df.index, y=df['Close'], mode='lines', name='Close Price'))
+    fibonacci_retracement_fig = go.Figure(go.Scatter(x=df.index, y=df['close'], mode='lines', name='Close Price'))
     for level in levels:
         fibonacci_retracement_fig.add_trace(go.Scatter(x=[df.index[0], df.index[-1]], y=[levels[level], levels[level]],
                                      mode='lines', name=f'Fibonacci {level}', line=dict(dash='dash')))
@@ -600,7 +606,7 @@ def update_graphs(ticker, time_range):
     )
 
     # Ichimoku Cloud Chart
-    ichimoku_cloud_fig = go.Figure(go.Scatter(x=df.index, y=df['Close'], mode='lines', name='Close Price'))
+    ichimoku_cloud_fig = go.Figure(go.Scatter(x=df.index, y=df['close'], mode='lines', name='Close Price'))
     ichimoku_cloud_fig.add_trace(go.Scatter(x=df.index, y=df['Tenkan_sen'], mode='lines', name='Tenkan-sen'))
     ichimoku_cloud_fig.add_trace(go.Scatter(x=df.index, y=df['Kijun_sen'], mode='lines', name='Kijun-sen'))
     ichimoku_cloud_fig.add_trace(go.Scatter(x=df.index, y=df['Senkou_span_a'], mode='lines', name='Senkou Span A'))
@@ -614,7 +620,7 @@ def update_graphs(ticker, time_range):
     )
 
     # VWAP Chart
-    vwap_fig = go.Figure(go.Scatter(x=df.index, y=df['Close'], mode='lines', name='Close Price'))
+    vwap_fig = go.Figure(go.Scatter(x=df.index, y=df['close'], mode='lines', name='Close Price'))
     vwap_fig.add_trace(go.Scatter(x=df.index, y=df['VWAP'], mode='lines', name='VWAP'))
     vwap_fig.update_layout(
         title=f'{ticker} VWAP',
