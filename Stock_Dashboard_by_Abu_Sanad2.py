@@ -1,7 +1,7 @@
 import dash
 from dash import dcc, html
 from dash.dependencies import Input, Output
-from yahooquery import Ticker  # Changed from yfinance import yf
+from yahooquery import Ticker  # Using yahooquery instead of yfinance
 import plotly.graph_objs as go
 import pandas as pd
 import ta
@@ -49,162 +49,53 @@ app.layout = dbc.Container([
     ], justify='center', className="my-3"),
     
     dbc.Row([
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    dcc.Graph(id='candlestick-chart')
-                ])
-            ]),
-        ], width=12),
+        dbc.Col([dbc.Card([dbc.CardBody([dcc.Graph(id='candlestick-chart')])])], width=12),
     ], className="mb-4"),
     
     dbc.Row([
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    dcc.Graph(id='sma-ema-chart')
-                ])
-            ]),
-        ], width=12),
+        dbc.Col([dbc.Card([dbc.CardBody([dcc.Graph(id='sma-ema-chart')])])], width=12),
     ], className="mb-4"),
     
     dbc.Row([
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    dcc.Graph(id='support-resistance-chart')
-                ])
-            ]),
-        ], width=6),
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    dcc.Graph(id='rsi-chart')
-                ])
-            ]),
-        ], width=6),
+        dbc.Col([dbc.Card([dbc.CardBody([dcc.Graph(id='support-resistance-chart')])])], width=6),
+        dbc.Col([dbc.Card([dbc.CardBody([dcc.Graph(id='rsi-chart')])])], width=6),
     ], className="mb-4"),
     
     dbc.Row([
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    dcc.Graph(id='bollinger-bands-chart')
-                ])
-            ]),
-        ], width=6),
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    dcc.Graph(id='macd-chart')
-                ])
-            ]),
-        ], width=6),
+        dbc.Col([dbc.Card([dbc.CardBody([dcc.Graph(id='bollinger-bands-chart')])])], width=6),
+        dbc.Col([dbc.Card([dbc.CardBody([dcc.Graph(id='macd-chart')])])], width=6),
     ], className="mb-4"),
     
     dbc.Row([
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    dcc.Graph(id='stochastic-oscillator-chart')
-                ])
-            ]),
-        ], width=6),
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    dcc.Graph(id='obv-chart')
-                ])
-            ]),
-        ], width=6),
+        dbc.Col([dbc.Card([dbc.CardBody([dcc.Graph(id='stochastic-oscillator-chart')])])], width=6),
+        dbc.Col([dbc.Card([dbc.CardBody([dcc.Graph(id='obv-chart')])])], width=6),
     ], className="mb-4"),
     
     dbc.Row([
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    dcc.Graph(id='atr-chart')
-                ])
-            ]),
-        ], width=6),
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    dcc.Graph(id='cci-chart')
-                ])
-            ]),
-        ], width=6),
+        dbc.Col([dbc.Card([dbc.CardBody([dcc.Graph(id='atr-chart')])])], width=6),
+        dbc.Col([dbc.Card([dbc.CardBody([dcc.Graph(id='cci-chart')])])], width=6),
     ], className="mb-4"),
     
     dbc.Row([
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    dcc.Graph(id='mfi-chart')
-                ])
-            ]),
-        ], width=6),
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    dcc.Graph(id='cmf-chart')
-                ])
-            ]),
-        ], width=6),
+        dbc.Col([dbc.Card([dbc.CardBody([dcc.Graph(id='mfi-chart')])])], width=6),
+        dbc.Col([dbc.Card([dbc.CardBody([dcc.Graph(id='cmf-chart')])])], width=6),
     ], className="mb-4"),
     
     dbc.Row([
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    dcc.Graph(id='fi-chart')
-                ])
-            ]),
-        ], width=6),
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    dcc.Graph(id='fibonacci-retracement-chart')
-                ])
-            ]),
-        ], width=6),
+        dbc.Col([dbc.Card([dbc.CardBody([dcc.Graph(id='fi-chart')])])], width=6),
+        dbc.Col([dbc.Card([dbc.CardBody([dcc.Graph(id='fibonacci-retracement-chart')])])], width=6),
     ], className="mb-4"),
     
     dbc.Row([
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    dcc.Graph(id='ichimoku-cloud-chart')
-                ])
-            ]),
-        ], width=6),
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    dcc.Graph(id='vwap-chart')
-                ])
-            ]),
-        ], width=6),
+        dbc.Col([dbc.Card([dbc.CardBody([dcc.Graph(id='ichimoku-cloud-chart')])])], width=6),
+        dbc.Col([dbc.Card([dbc.CardBody([dcc.Graph(id='vwap-chart')])])], width=6),
     ], className="mb-4"),
     
     dbc.Row([
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    dcc.Graph(id='adl-chart')
-                ])
-            ]),
-        ], width=6),
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    dcc.Graph(id='adx-di-chart')
-                ])
-            ]),
-        ], width=6),
+        dbc.Col([dbc.Card([dbc.CardBody([dcc.Graph(id='adl-chart')])])], width=6),
+        dbc.Col([dbc.Card([dbc.CardBody([dcc.Graph(id='adx-di-chart')])])], width=6),
     ], className="mb-4"),
-
-    # Explanation of Metrics Section
+    
     dbc.Row([
         dbc.Col([
             dbc.Card([
@@ -266,18 +157,28 @@ app.layout = dbc.Container([
     [Input('stock-input', 'value'), Input('time-range', 'value')]
 )
 def update_graphs(ticker, time_range):
-    # Append '.SR' if the ticker is an integer
+    # Append '.SR' if the ticker is all digits
     if ticker.isdigit():
         ticker += '.SR'
     
     # Fetch stock data using yahooquery
     tq = Ticker(ticker)
     df = tq.history(period=time_range)
-    # Adjust index if it is a MultiIndex (with symbol and date)
+    
+    # Adjust the index if it's a MultiIndex (with symbol and date)
     if isinstance(df.index, pd.MultiIndex):
         df.index = df.index.get_level_values('date')
     
-    # Calculate SMAs and EMAs
+    # If no data is returned, create an empty figure and return it for all outputs
+    if df.empty:
+        empty_fig = go.Figure()
+        empty_fig.update_layout(
+            title=f"No data available for ticker {ticker} and period {time_range}",
+            template='plotly_dark'
+        )
+        return tuple([empty_fig] * 18)
+    
+    # Calculate indicators based on yahooquery column names (all lower-case)
     df['SMA_20'] = df['close'].rolling(window=20).mean()
     df['SMA_50'] = df['close'].rolling(window=50).mean()
     df['SMA_200'] = df['close'].rolling(window=200).mean()
@@ -297,8 +198,8 @@ def update_graphs(ticker, time_range):
 
     df['20_day_ma'] = df['close'].rolling(window=20).mean().round(2)
     df['20_day_std'] = df['close'].rolling(window=20).std().round(2)
-    df['Upper_band'] = df['20_day_ma'] + (df['20_day_std']*2).round(2)
-    df['Lower_band'] = df['20_day_ma'] - (df['20_day_std']*2).round(2)
+    df['Upper_band'] = df['20_day_ma'] + (df['20_day_std'] * 2).round(2)
+    df['Lower_band'] = df['20_day_ma'] - (df['20_day_std'] * 2).round(2)
     
     exp1 = df['close'].ewm(span=12, adjust=False).mean().round(2)
     exp2 = df['close'].ewm(span=26, adjust=False).mean().round(2)
@@ -327,13 +228,11 @@ def update_graphs(ticker, time_range):
     df['CMF'] = ta.volume.ChaikinMoneyFlowIndicator(df['high'], df['low'], df['close'], df['volume'], window=20).chaikin_money_flow()
     df['FI'] = ta.volume.ForceIndexIndicator(df['close'], df['volume']).force_index()
 
-    # Calculate ADX and DI+ and DI-
     adx_indicator = ta.trend.ADXIndicator(df['high'], df['low'], df['close'])
     df['ADX'] = adx_indicator.adx()
     df['DI+'] = adx_indicator.adx_pos()
     df['DI-'] = adx_indicator.adx_neg()
 
-    # Calculate Fibonacci retracement levels
     max_price = df['high'].max()
     min_price = df['low'].min()
     diff = max_price - min_price
@@ -347,7 +246,6 @@ def update_graphs(ticker, time_range):
         '100.0%': min_price,
     }
 
-    # Calculate Ichimoku Cloud components
     df['Tenkan_sen'] = (df['high'].rolling(window=9).max() + df['low'].rolling(window=9).min()) / 2
     df['Kijun_sen'] = (df['high'].rolling(window=26).max() + df['low'].rolling(window=26).min()) / 2
     df['Senkou_span_a'] = ((df['Tenkan_sen'] + df['Kijun_sen']) / 2).shift(26)
@@ -355,13 +253,21 @@ def update_graphs(ticker, time_range):
     df['Chikou_span'] = df['close'].shift(-26)
 
     # Candlestick Chart
-    candlestick_fig = go.Figure(go.Candlestick(x=df.index,
-                                               open=df['open'],
-                                               high=df['high'],
-                                               low=df['low'],
-                                               close=df['close'],
-                                               name='Candlestick'))
-    candlestick_fig.add_trace(go.Bar(x=df.index, y=df['volume'], name='Volume', marker_color='rgba(52, 152, 219, 0.5)', yaxis='y2'))
+    candlestick_fig = go.Figure(go.Candlestick(
+        x=df.index,
+        open=df['open'],
+        high=df['high'],
+        low=df['low'],
+        close=df['close'],
+        name='Candlestick'
+    ))
+    candlestick_fig.add_trace(go.Bar(
+        x=df.index,
+        y=df['volume'],
+        name='Volume',
+        marker_color='rgba(52, 152, 219, 0.5)',
+        yaxis='y2'
+    ))
     candlestick_fig.update_layout(
         title=f'{ticker} Candlestick Chart',
         yaxis_title='Stock Price',
@@ -408,11 +314,7 @@ def update_graphs(ticker, time_range):
         y0=70,
         x1=df.index[-1],
         y1=70,
-        line=dict(
-            color='Red',
-            width=2,
-            dash='dash',
-        )
+        line=dict(color='Red', width=2, dash='dash')
     )
     rsi_fig.add_shape(
         type='line',
@@ -420,11 +322,7 @@ def update_graphs(ticker, time_range):
         y0=30,
         x1=df.index[-1],
         y1=30,
-        line=dict(
-            color='Green',
-            width=2,
-            dash='dash',
-        )
+        line=dict(color='Green', width=2, dash='dash')
     )
     rsi_fig.update_layout(
         title=f'{ticker} RSI',
@@ -467,7 +365,7 @@ def update_graphs(ticker, time_range):
         template='plotly_dark'
     )
 
-    # On-Balance Volume (OBV) Chart
+    # OBV Chart
     obv_fig = go.Figure(go.Scatter(x=df.index, y=df['OBV'], mode='lines', name='OBV'))
     obv_fig.update_layout(
         title=f'{ticker} On-Balance Volume',
@@ -476,7 +374,7 @@ def update_graphs(ticker, time_range):
         template='plotly_dark'
     )
 
-    # Average True Range (ATR) Chart
+    # ATR Chart
     atr_fig = go.Figure(go.Scatter(x=df.index, y=df['ATR'], mode='lines', name='ATR'))
     atr_fig.update_layout(
         title=f'{ticker} Average True Range',
@@ -493,11 +391,7 @@ def update_graphs(ticker, time_range):
         y0=100,
         x1=df.index[-1],
         y1=100,
-        line=dict(
-            color='Red',
-            width=2,
-            dash='dash',
-        )
+        line=dict(color='Red', width=2, dash='dash')
     )
     cci_fig.add_shape(
         type='line',
@@ -505,11 +399,7 @@ def update_graphs(ticker, time_range):
         y0=-100,
         x1=df.index[-1],
         y1=-100,
-        line=dict(
-            color='Green',
-            width=2,
-            dash='dash',
-        )
+        line=dict(color='Green', width=2, dash='dash')
     )
     cci_fig.update_layout(
         title=f'{ticker} Commodity Channel Index',
@@ -526,11 +416,7 @@ def update_graphs(ticker, time_range):
         y0=80,
         x1=df.index[-1],
         y1=80,
-        line=dict(
-            color='Red',
-            width=2,
-            dash='dash',
-        )
+        line=dict(color='Red', width=2, dash='dash')
     )
     mfi_fig.add_shape(
         type='line',
@@ -538,11 +424,7 @@ def update_graphs(ticker, time_range):
         y0=20,
         x1=df.index[-1],
         y1=20,
-        line=dict(
-            color='Green',
-            width=2,
-            dash='dash',
-        )
+        line=dict(color='Green', width=2, dash='dash')
     )
     mfi_fig.update_layout(
         title=f'{ticker} Money Flow Index',
@@ -559,11 +441,7 @@ def update_graphs(ticker, time_range):
         y0=0,
         x1=df.index[-1],
         y1=0,
-        line=dict(
-            color='Red',
-            width=2,
-            dash='dash',
-        )
+        line=dict(color='Red', width=2, dash='dash')
     )
     cmf_fig.update_layout(
         title=f'{ticker} Chaikin Money Flow',
@@ -580,11 +458,7 @@ def update_graphs(ticker, time_range):
         y0=0,
         x1=df.index[-1],
         y1=0,
-        line=dict(
-            color='Red',
-            width=2,
-            dash='dash',
-        )
+        line=dict(color='Red', width=2, dash='dash')
     )
     fi_fig.update_layout(
         title=f'{ticker} Force Index',
@@ -596,8 +470,13 @@ def update_graphs(ticker, time_range):
     # Fibonacci Retracement Chart
     fibonacci_retracement_fig = go.Figure(go.Scatter(x=df.index, y=df['close'], mode='lines', name='Close Price'))
     for level in levels:
-        fibonacci_retracement_fig.add_trace(go.Scatter(x=[df.index[0], df.index[-1]], y=[levels[level], levels[level]],
-                                     mode='lines', name=f'Fibonacci {level}', line=dict(dash='dash')))
+        fibonacci_retracement_fig.add_trace(go.Scatter(
+            x=[df.index[0], df.index[-1]],
+            y=[levels[level], levels[level]],
+            mode='lines',
+            name=f'Fibonacci {level}',
+            line=dict(dash='dash')
+        ))
     fibonacci_retracement_fig.update_layout(
         title=f'{ticker} Fibonacci Retracement',
         yaxis_title='Stock Price',
@@ -654,9 +533,9 @@ def update_graphs(ticker, time_range):
         template='plotly_dark'
     )
 
-    return (candlestick_fig, sma_ema_fig, support_resistance_fig, rsi_fig, bollinger_bands_fig, macd_fig, stochastic_oscillator_fig,
-            obv_fig, atr_fig, cci_fig, mfi_fig, cmf_fig, fi_fig, fibonacci_retracement_fig, ichimoku_cloud_fig, vwap_fig, adl_fig, adx_di_fig)
+    return (candlestick_fig, sma_ema_fig, support_resistance_fig, rsi_fig, bollinger_bands_fig,
+            macd_fig, stochastic_oscillator_fig, obv_fig, atr_fig, cci_fig, mfi_fig, cmf_fig, fi_fig,
+            fibonacci_retracement_fig, ichimoku_cloud_fig, vwap_fig, adl_fig, adx_di_fig)
 
-# Run the app
 if __name__ == '__main__':
     app.run_server(debug=True)
