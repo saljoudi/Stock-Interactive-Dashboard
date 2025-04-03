@@ -1,6 +1,6 @@
 import dash
 from dash import dcc, html
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 from yahooquery import Ticker  # Using yahooquery instead of yfinance
 import plotly.graph_objs as go
 import pandas as pd
@@ -47,6 +47,14 @@ app.layout = dbc.Container([
             )
         ], width=4),
     ], justify='center', className="my-3"),
+    
+    # Added Analyze Stock button
+    dbc.Row([
+        dbc.Col(
+            dbc.Button("Analyze Stock", id='analyze-button', n_clicks=0, color="primary"),
+            width="auto"
+        )
+    ], justify="center", className="my-3"),
     
     dbc.Row([
         dbc.Col([dbc.Card([dbc.CardBody([dcc.Graph(id='candlestick-chart')])])], width=12),
@@ -154,9 +162,19 @@ app.layout = dbc.Container([
      Output('vwap-chart', 'figure'),
      Output('adl-chart', 'figure'),
      Output('adx-di-chart', 'figure')],
-    [Input('stock-input', 'value'), Input('time-range', 'value')]
+    [Input('analyze-button', 'n_clicks')],
+    [State('stock-input', 'value'), State('time-range', 'value')]
 )
-def update_graphs(ticker, time_range):
+def update_graphs(n_clicks, ticker, time_range):
+    # Only run the analysis if the button has been clicked at least once
+    if not n_clicks:
+        empty_fig = go.Figure()
+        empty_fig.update_layout(
+            title="Click 'Analyze Stock' to display the analysis",
+            template='plotly_dark'
+        )
+        return tuple([empty_fig] * 18)
+    
     # Append '.SR' if the ticker is all digits
     if ticker.isdigit():
         ticker += '.SR'
