@@ -190,6 +190,7 @@ app.layout = dbc.Container([
     State('interval',     'value')               # <-- NEW
 )
 def update_graphs(n_clicks, ticker, time_range, interval):
+    # Return empty figs until the first click
     if not n_clicks:
         empty = go.Figure().update_layout(
             title="Click 'Analyze Stock' to display the analysis",
@@ -200,43 +201,20 @@ def update_graphs(n_clicks, ticker, time_range, interval):
     if ticker.isdigit():
         ticker += '.SR'
 
-    try:
-        # Use yahoo_fin to fetch 1y (approx. 252 trading days) of data
-        df = si.get_data(
-            ticker,
-            interval=interval,
-            headers={'User-agent': 'Mozilla/5.0'}
-        ).tail(252)
+    # Fetch data with selected period & interval
+    tq = Ticker(ticker)
+    df = tq.history(period=time_range, interval=interval)
 
-        if df is None or df.empty:
-            raise ValueError(f"No data for {ticker}")
-        
-        df = df.reset_index()
-        df.columns = [c.capitalize() for c in df.columns]
-        df = df.query("Volume != 0")
+    # Handle MultiIndex (symbol, date)
+    if isinstance(df.index, pd.MultiIndex):
+        df.index = df.index.get_level_values('date')
 
-        df['Date'] = df['Index'].dt.strftime('%Y-%m-%d')
-        df.set_index('Date', inplace=True)
-        df.index = pd.to_datetime(df.index)
-        df.drop(columns=['Index'], inplace=True)
-
-        # Capitalize column names to match yahooquery convention
-        df.rename(columns={
-            'Open': 'open',
-            'High': 'high',
-            'Low': 'low',
-            'Close': 'close',
-            'Adjclose': 'adjclose',
-            'Volume': 'volume'
-        }, inplace=True)
-
-    except Exception as e:
-        print(f"Error fetching data: {e}")
+    # If no data => empty figs
+    if df.empty:
         empty = go.Figure().update_layout(
             title=f"No data for {ticker} ({time_range}, {interval})",
             template='plotly_dark')
         return (empty,) * 18
-
 
     # === Indicators (all lower-case column names from yahooquery) ===
     df['SMA_20']  = df['close'].rolling(20).mean()
