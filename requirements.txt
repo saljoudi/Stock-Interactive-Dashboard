@@ -1,10 +1,7 @@
-dash 
-yfinance
+dash
+dash-bootstrap-components
+yahooquery
 plotly
 pandas
-plotly
-ta 
-dash_bootstrap_components
-gunicorn
-joblib
-yahooquery
+ta
+numpy
