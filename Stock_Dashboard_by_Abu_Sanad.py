@@ -409,3 +409,4 @@ def update_graphs(n_clicks, ticker, time_range, interval):
 # ─────────────────────────────────────────────
 if __name__ == '__main__':
     app.run_server(debug=True)
+    # Original USing YahhoQuery
